@@ -6,10 +6,10 @@ from utils import cols, events, event_keys, years, str_to_time
 import warnings
 warnings.filterwarnings('ignore')
 
-#mode = 'append'
-mode = 'write'
+mode = 'append'
+#mode = 'write'
 
-df_name = 'athletics_IT.csv'
+df_name = 'athletics_IT_2.csv'
 query_template = "https://www.fidal.it/graduatorie.php?anno={}&tipo_attivita={}&sesso={}&categoria=X{}&gara={}&tipologia_estrazione=2&vento=0&regione=0&nazionalita=2&limite=0&societa=&submit=Invia"
 df = pd.DataFrame(columns=cols)
 if mode == 'append':
@@ -28,13 +28,16 @@ for event, v in events.items():
                 page = requests.get(query)
                 soup = BeautifulSoup(page.content, "html.parser")
                 results = soup.find("table", {"class": "tabella"})
+                if results is None:
+                    print('Warning: this even has no entries')
+                    continue
                 elements = results.find_all("tr")
                 if elements is None:
                     print('Warning: this even has no entries')
                     continue
                 for el in elements:  # for each athlete
                     stats = [s.text.strip() for s in el]
-                    print(stats)
+                    #print(stats)
                     if len(stats) <= 2:
                         continue
                     if stats[3] is not None and len(stats[3]) > 0:
@@ -63,5 +66,6 @@ for event, v in events.items():
                     df = df.append(row, ignore_index=True)
                     #print(row)
                 print('Added {} athletes records'.format(len(elements)))
+    df.to_csv(df_name, encoding='utf-8')
+    print('Scraped {} data. Dataset saved to: {}'.format(event, df_name))
 print('Done! Scraped {} athletes records'.format(len(df)))
-df.to_csv(df_name, sep='\t', encoding='utf-8')
