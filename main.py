@@ -13,7 +13,9 @@ df_name = 'athletics_IT_2.csv'
 query_template = "https://www.fidal.it/graduatorie.php?anno={}&tipo_attivita={}&sesso={}&categoria=X{}&gara={}&tipologia_estrazione=2&vento=0&regione=0&nazionalita=2&limite=0&societa=&submit=Invia"
 df = pd.DataFrame(columns=cols)
 if mode == 'append':
-    df = pd.read_csv(df_name, error_bad_lines=False)
+    df = pd.read_csv(df_name, error_bad_lines=False, index_col=None)
+df['date'] = pd.to_datetime(df['date'])
+df['time'] = pd.to_datetime(df['time'])
 
 for event, v in events.items():
     types = v[event_keys['type']]
@@ -22,7 +24,11 @@ for event, v in events.items():
     for t in types:
         for s in v[event_keys['sex']]:
             for y in years:
-                print('Scraping event: {} ({}) ({}) of year {}'.format(event, t, s, y))
+                full_event_name = '{} ({}) ({}) of year {}'.format(event, t, s, y)
+                print('Scraping event: {}'.format(full_event_name))
+                if len(df[(df.event == event) & (df.type == t) & (df.sex == s) & (df.date.dt.year == y)]) > 0:
+                    print('Event skipped: already scraped')
+                    continue
                 y = str(y)
                 query = query_template.format(y, t, s, s, event_number)
                 page = requests.get(query)
@@ -66,6 +72,7 @@ for event, v in events.items():
                     df = df.append(row, ignore_index=True)
                     #print(row)
                 print('Added {} athletes records'.format(len(elements)))
-    df.to_csv(df_name, encoding='utf-8')
-    print('Scraped {} data. Dataset saved to: {}'.format(event, df_name))
+                df['date'] = pd.to_datetime(df['date'])
+                df.to_csv(df_name, index=False)
+                print('Scraped {} data. Data saved to: {}'.format(full_event_name, df_name))
 print('Done! Scraped {} athletes records'.format(len(df)))

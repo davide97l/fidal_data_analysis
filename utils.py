@@ -13,8 +13,8 @@ events = {
     '200m': [200, ['P', 'I'], '04', '18.0', ['M', 'F']],
     '300m': [300, ['P'], '05', '29.0', ['M', 'F']],
     '400m': [400, ['P', 'I'], '06', '40.0', ['M', 'F']],
-    '400m H': [400, ['P'], 'KQ', '40.0', ['M']],  # only male
-    '4000m H76': [400, ['P'], 'KS', '45.0', ['F']],  # only female
+    '400m H91': [400, ['P'], 'KQ', '40.0', ['M']],  # only male
+    '400m H76': [400, ['P'], 'KS', '45.0', ['F']],  # only female
     '800m': [800, ['P', 'I'], '08', '1:40.0', ['M', 'F']],
     '1000m': [1000, ['P'], '09', '2:0.0', ['M', 'F']],
     '1500m': [1500, ['P', 'I'], '11', '3:20.0', ['M', 'F']],
@@ -47,7 +47,20 @@ def str_to_time(time_str):
         else:
             time_format = '%M:%S'
     elif '.' in time_str:
-        time_format = '%S.%f'
+        if len(time_str.split('.')) == 3:
+            time_format = '%M.%S.%f'
+        else:
+            time_format = '%S.%f'
     else:
         return pd.NA
     return pd.to_datetime(time_str, format=time_format).time()
+
+
+def clean_time(df):
+    df['time'] = df['time'].dt.time
+    return df
+
+
+def clean_date(df):
+    df['date'] = df['date'].dt.date
+    return df
