@@ -51,7 +51,11 @@ for event, v in events.items():
                         birth_year = stats[3] + 2000 if stats[3] < 25 else stats[3] + 1900
                     else:
                         birth_year = pd.NA  # birth year: str to int
-                    time = str_to_time(stats[0])
+                    try:
+                        time = str_to_time(stats[0])
+                    except:
+                        print('Wrong time format: skipping entry')
+                        continue
                     if time < down_limit:
                         print('Invalid time {} < {}: skipping entry'.format(time, down_limit))
                         continue
@@ -73,6 +77,7 @@ for event, v in events.items():
                     #print(row)
                 print('Added {} athletes records'.format(len(elements)))
                 df['date'] = pd.to_datetime(df['date'])
+                df.time = pd.to_datetime(df['time']).dt.time
                 df.to_csv(df_name, index=False)
                 print('Scraped {} data. Data saved to: {}'.format(full_event_name, df_name))
 print('Done! Scraped {} athletes records'.format(len(df)))
