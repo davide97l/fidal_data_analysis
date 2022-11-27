@@ -6,6 +6,9 @@ Running events range from 60m to 100km on road covering indoors, outdoors, and r
 
 This dataset is also available on [Kaggle](https://www.kaggle.com/datasets/davideliu/italian-athletics-historical-best-performances).
 
+## Related blogs
+- https://davideliu.com/2022/11/27/peak-performance-analysis-of-the-track-and-field-5000m-event/
+
 ## Dataset overview
 
 The scraped data is saved in a `csv` format containing the following columns:
